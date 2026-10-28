@@ -66,10 +66,11 @@ Public packages can be pulled without authentication.
 ## Publish to GHCR
 
 The **Build container** GitHub Actions workflow builds and smoke-checks the image
-on pull requests. After this workflow is in the repository, run it manually with
-`publish=true` and a tag. It uses the repository's `GITHUB_TOKEN` with
-`packages:write`, publishes `linux/amd64` and `linux/arm64`, and attaches SBOM and
-provenance. It does not publish automatically from pull requests.
+on pull requests and on pushes to `main`. Publication stays manual: run the
+workflow with `publish=true` and a tag. It uses the repository's `GITHUB_TOKEN`
+with `packages:write`, publishes `linux/amd64` and `linux/arm64`, and attaches
+SBOM and provenance. No push or merged pull request publishes an image on its
+own.
 Smoke and multi-architecture builds retain separate caches between runs.
 
 From an authenticated GitHub CLI checkout:
