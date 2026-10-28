@@ -1,14 +1,21 @@
 name: Validate Hobbyfiles
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   validate:
+    name: validate (node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
+      fail-fast: false
       matrix:
         node: [22, 24]
     services:
@@ -23,8 +30,63 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: yarn
       - run: sudo apt-get update && sudo apt-get install -y poppler-utils firejail
-      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn install --frozen-lockfile --non-interactive --production=false
       - run: yarn audit:production
       - run: yarn lint
       - run: yarn test:unit --runInBand --silent
       - run: yarn prestart
+
+  integration:
+    name: integration (node 22)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      HTTP_PORT: 8080
+      REDIS_URL: redis://127.0.0.1:6379
+      HOBBYFILES_WORKERS: 2
+      HOBBYFILES_TEST_BASE: http://127.0.0.1:8080
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: yarn
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils firejail libimage-exiftool-perl ghostscript ffmpeg p7zip-full unrar file
+      - run: yarn install --frozen-lockfile --non-interactive --production=false
+      - name: Start a disposable instance
+        run: |
+          yarn prestart
+          NODE_ENV=production HOBBYFILES_SECRET="$(openssl rand -hex 32)" node server.js > server.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl -fsS "$HOBBYFILES_TEST_BASE/healthz" > /dev/null; then
+              echo "Health endpoint answered after ${attempt}s"
+              break
+            fi
+            sleep 1
+          done
+          # healthz is served outside the page router: prove the views render too,
+          # otherwise the suite reports 403s against a broken instance instead of covering pages.
+          for attempt in $(seq 1 30); do
+            if [ "$(curl -s -o /dev/null -w '%{http_code}' "$HOBBYFILES_TEST_BASE/")" = "200" ]; then
+              echo "Landing page answered 200 after ${attempt}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Instance did not serve the landing page" >&2
+          tail -n 200 server.log >&2
+          exit 1
+      - name: Run the integration suite
+        run: |
+          # The suite skips itself when the target is unreachable, so re-assert the
+          # instance before running it: a dead server must fail, not pass silently.
+          curl -fsS "$HOBBYFILES_TEST_BASE/healthz" > /dev/null
+          yarn test:integration --runInBand --silent
+      - name: Instance log
+        if: always()
+        run: tail -n 200 server.log || true
