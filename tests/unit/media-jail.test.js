@@ -13,6 +13,8 @@
  * network is involved.
  */
 
+const path = require("path");
+
 function loadJail(jail) {
   jest.resetModules();
   jest.doMock("../../lib/config", () => ({
@@ -37,8 +39,11 @@ describe("maybeJail", () => {
 
   test("gives the jail a private home when a directory is named", () => {
     const { maybeJail } = loadJail(true);
-    const argv = maybeJail(["7z", "l", "a.7z"], { privateDir: "/uploads/ab" });
-    expect(argv.some(a => a === "--private=/uploads/ab")).toBe(true);
+    const privateDir = "/uploads/ab";
+    const argv = maybeJail(["7z", "l", "a.7z"], { privateDir });
+    // sandboxPaths() resolves the directory so the jail and the rewritten file
+    // arguments address the same place, which differs by platform.
+    expect(argv).toContain(`--private=${path.resolve(privateDir)}`);
   });
 
   test("never wraps a command that already carries the jail", () => {

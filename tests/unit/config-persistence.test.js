@@ -12,7 +12,11 @@ test("concurrent config patches merge, preserve secrets and mode, and reject cor
     await fs.writeFile(file, JSON.stringify({ private: "synthetic-secret" }), { mode: 0o600 });
     await Promise.all([persistConfig({ name: "test" }, file), persistConfig({ motto: "test" }, file)]);
     expect(JSON.parse(await fs.readFile(file, "utf8"))).toEqual({ private: "synthetic-secret", name: "test", motto: "test" });
-    expect((await fs.stat(file)).mode & 0o777).toBe(0o600);
+    // Windows has no POSIX mode bits: fs.stat derives them from the read-only
+    // attribute, so only a POSIX host can hold the file at 0o600.
+    if (process.platform !== "win32") {
+      expect((await fs.stat(file)).mode & 0o777).toBe(0o600);
+    }
     await fs.writeFile(file, "invalid");
     await expect(persistConfig({ name: "replacement" }, file)).rejects.toThrow();
     expect(await fs.readFile(file, "utf8")).toBe("invalid");

@@ -80,7 +80,12 @@ test("separate HTTP workers share one authenticated torrent relay and retain byt
     const registryKey = [...records.keys()][0];
     await session.onClose();
     // An abruptly stopped owner may leave a socket path until its TTL expires.
-    fs.writeFileSync(relay.socket, "stale");
+    // On Windows the relay is a named pipe, which cannot be materialised as a
+    // file: the pipe disappears with its server, so restoring the registry
+    // record alone reproduces the stale owner.
+    if (process.platform !== "win32") {
+      fs.writeFileSync(relay.socket, "stale");
+    }
     records.set(registryKey, JSON.stringify(relay));
     const stale = await fetch(`${url}progress`);
     expect(stale.status).toBe(200); expect((await stale.json()).phase).toBe("connecting");
