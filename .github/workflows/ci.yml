@@ -97,7 +97,8 @@ jobs:
     timeout-minutes: 25
     env:
       HTTP_PORT: 8090
-      HOBBYFILES_WORKERS: 1
+      REDIS_URL: redis://127.0.0.1:6379
+      HOBBYFILES_WORKERS: 2
       HOBBYFILES_TEST_BASE: http://127.0.0.1:8090
     steps:
       - uses: actions/checkout@v7
@@ -105,6 +106,27 @@ jobs:
         with:
           node-version: 22
           cache: yarn
+      # The broker is Redis-only and a Windows runner has no service containers,
+      # so install a Redis-compatible server. Memurai is Redis 7 compatible.
+      - name: Install a Redis-compatible server
+        shell: pwsh
+        run: |
+          choco install memurai-developer -y --no-progress
+          for ($i = 1; $i -le 60; $i++) {
+            $probe = New-Object System.Net.Sockets.TcpClient
+            try {
+              $probe.Connect("127.0.0.1", 6379)
+              $probe.Close()
+              Write-Host "Redis answered on 6379 after $i s"
+              exit 0
+            }
+            catch {
+              $probe.Dispose()
+              Start-Sleep -Seconds 1
+            }
+          }
+          Write-Error "No Redis on 127.0.0.1:6379"
+          exit 1
       # No firejail, poppler or unrar on this runner: the preview tools are
       # optional, and the suite has to stay green without them.
       - run: yarn install --frozen-lockfile --non-interactive --production=false
