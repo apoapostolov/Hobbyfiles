@@ -21,6 +21,11 @@ updates:
           - minor
           - patch
     ignore:
+      # minimatch 11 fixes GHSA-g3hv-75wg-m249 but eslint 10.13.0 still requires
+      # minimatch ^10.2.x through @eslint/config-array, so the security update
+      # cannot resolve. Retrying it every day only produces a failed run, which
+      # is why the version is skipped here until eslint widens the range.
+      - dependency-name: "minimatch"
       # Major upgrades for these packages require manual vetting
       - dependency-name: "webpack"
         update-types: ["version-update:semver-major"]
