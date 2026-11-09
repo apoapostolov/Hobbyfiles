@@ -105,6 +105,7 @@
     "undici": "^6.29.1",
     "**/router/path-to-regexp": "8.4.2",
     "ws": "8.22.0",
-    "**/@istanbuljs/load-nyc-config/js-yaml": "4.3.2"
+    "**/@istanbuljs/load-nyc-config/js-yaml": "4.3.2",
+    "**/minimatch": "^11.0.2"
   }
 }
