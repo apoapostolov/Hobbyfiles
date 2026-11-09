@@ -60,7 +60,7 @@
     "redis": "^6.3.1",
     "send": "^1.2.1",
     "serve-static": "^2.2.1",
-    "shaka-player": "^5.3.3",
+    "shaka-player": "^5.3.4",
     "sharp": "^0.35.5",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
