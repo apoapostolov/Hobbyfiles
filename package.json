@@ -86,7 +86,7 @@
     "globals": "^17.14.0",
     "jest": "^30.5.2",
     "mini-css-extract-plugin": "^2.9.2",
-    "supertest": "^7.0.0",
+    "supertest": "^7.3.2",
     "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.112.1",
     "webpack-cli": "^7.3.1"
