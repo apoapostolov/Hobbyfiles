@@ -298,6 +298,12 @@ module.exports = {
   // or cannot render a particular document.
   pdftoppm: "pdftoppm",
 
+  // RAR lister and extractor for archive previews and CBR comics
+  unrar: "unrar",
+
+  // 7-Zip for 7z archives and CB7 comics
+  sevenzip: "7z",
+
   // Max number of concurrent asset generators
   maxAssetsProcesses: 2,
 
