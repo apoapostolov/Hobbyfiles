@@ -12,9 +12,14 @@ const commands = [
   ["ffmpeg", ["-version"], "video and audio previews"],
   ["ffprobe", ["-version"], "video playback inspection"],
   ["7z", ["i"], "7z and CB7 archive support"],
-  ["firejail", ["--version"], "external file-tool sandbox"],
   ["unrar", [], "RAR archive listing and extraction"],
 ];
+
+// Firejail is the Linux sandbox. A Windows or macOS host never has it, so
+// checking it there reports a missing tool the platform cannot install.
+if (process.platform === "linux") {
+  commands.push(["firejail", ["--version"], "external file-tool sandbox"]);
+}
 
 const missing = [];
 for (const [command, args, purpose] of commands) {
