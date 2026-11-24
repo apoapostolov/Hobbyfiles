@@ -35,6 +35,28 @@ collections worth browsing together. Each room brings chat, temporary uploads,
 requests, file readers, moderation, and optional automation together. You run
 the server yourself; there is no public Hobbyfiles service.
 
+## Latest release
+
+**1.5.0.** Read books and comics, inspect 3D printing models, and watch movie or
+TV torrents without leaving the room. ZIP previews open documents, comics,
+images, videos, and models together with their linked textures. Continue
+Reading keeps up to ten books handy, and Continue Watching remembers video
+timestamps.
+
+Movie and TV torrents now show searchable contents, peer counts, matched titles,
+subtitles, and watch progress. Watch opens the largest movie video or the first
+unfinished episode in a season pack, skipping episodes watched to 90 percent.
+Streams start automatically when ready, and the interface includes 34 themes
+with compact phone and tablet controls.
+
+For room owners, 27 opt-in bots collect approved feeds and cloud files, manage
+the community, and handle maintenance. Plugin API v2, 57 scoped MCP tools, and
+Linux amd64 and arm64 GHCR images support automation and self-hosting.
+
+Read the [changelog](CHANGELOG.md) for the full list, and the
+[operator notes](CHANGELOG.md#operator-notes) before turning on collection bots
+on an existing server.
+
 ## What you can do
 
 - **Share and chat in one room.** Post messages, upload files, share images and
@@ -292,28 +314,6 @@ The [Docker guide](docs/DOCKER.md) covers GHCR, configuration, backups,
 upgrades, and preview limitations. By default the container turns off external
 file tools; browser readers and image previews still work. Do not run the
 container in privileged mode to turn those tools back on.
-
-## Latest release
-
-**1.5.0.** Read books and comics, inspect 3D printing models, and watch movie or
-TV torrents without leaving the room. ZIP previews open documents, comics,
-images, videos, and models together with their linked textures. Continue
-Reading keeps up to ten books handy, and Continue Watching remembers video
-timestamps.
-
-Movie and TV torrents now show searchable contents, peer counts, matched titles,
-subtitles, and watch progress. Watch opens the largest movie video or the first
-unfinished episode in a season pack, skipping episodes watched to 90 percent.
-Streams start automatically when ready, and the interface includes 34 themes
-with compact phone and tablet controls.
-
-For room owners, 27 opt-in bots collect approved feeds and cloud files, manage
-the community, and handle maintenance. Plugin API v2, 57 scoped MCP tools, and
-Linux amd64 and arm64 GHCR images support automation and self-hosting.
-
-Read the [changelog](CHANGELOG.md) for the full list, and the
-[operator notes](CHANGELOG.md#operator-notes) before turning on collection bots
-on an existing server.
 
 ## Automation and operations
 
